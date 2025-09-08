@@ -17,7 +17,7 @@ class TextFormFieldHelper extends StatefulWidget {
   final TextInputAction? action;
   final FocusNode? focusNode;
 
-  final BorderRadius? borderRadius;
+  final double? borderRadius;
   final bool? isMobile;
 
   const TextFormFieldHelper({
@@ -54,7 +54,7 @@ class TextFormFieldHelper extends StatefulWidget {
 
 class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
   late bool obscureText;
-  TextDirection _textDirection = TextDirection.rtl;
+  TextDirection _textDirection = TextDirection.ltr;
 
   @override
   void initState() {
@@ -92,7 +92,6 @@ class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
       maxLength: widget.maxLength,
       obscureText: obscureText,
       obscuringCharacter: widget.obscuringCharacter ?? '*',
-
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       enabled: widget.enabled,
@@ -154,7 +153,7 @@ class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
     required double width,
   }) {
     return OutlineInputBorder(
-      borderRadius: widget.borderRadius ?? BorderRadius.circular(40),
+      borderRadius: BorderRadius.circular(widget.borderRadius ?? 40),
       borderSide: BorderSide(color: color, width: width),
     );
   }
