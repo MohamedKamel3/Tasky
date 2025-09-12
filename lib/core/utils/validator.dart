@@ -39,6 +39,24 @@ abstract class Validator {
   static String? validateName(String? val) {
     if (val == null || val.isEmpty) {
       return 'Name cannot be empty';
+    } else if (!RegExp(usernameRegexString).hasMatch(val)) {
+      return 'Enter a valid name';
+    } else {
+      return null;
+    }
+  }
+
+  static String? validateTitle(String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Title cannot be empty';
+    } else {
+      return null;
+    }
+  }
+
+  static String? validateDescription(String? val) {
+    if (val == null || val.isEmpty) {
+      return 'Description cannot be empty';
     } else {
       return null;
     }

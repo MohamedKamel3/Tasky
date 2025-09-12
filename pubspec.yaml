@@ -38,6 +38,10 @@ dependencies:
   firebase_core: ^4.1.0
   animate_do: ^4.2.0
   smooth_page_indicator: ^1.2.1
+  firebase_auth: ^6.0.2
+  cloud_firestore: ^6.0.1
+  flutter_slidable: ^4.0.1
+  # flutter_native_splash: ^2.4.6
 
 dev_dependencies:
   flutter_test:

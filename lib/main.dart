@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/features/auth/screens/login_screen.dart';
 import 'package:to_do_app/features/auth/screens/signup_screen.dart';
+import 'package:to_do_app/features/home/screens/home_screen.dart';
 import 'package:to_do_app/features/home/screens/on_boarding_screen.dart';
 import 'package:to_do_app/features/home/screens/splash_screen.dart';
+import 'package:to_do_app/features/home/screens/task_screen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -21,10 +23,12 @@ class ToDoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: SplashScreen.routName,
       routes: {
-        LoginScreen.routName: (context) => LoginScreen(),
-        SignupScreen.routName: (context) => SignupScreen(),
         SplashScreen.routName: (context) => SplashScreen(),
         OnBoardingScreen.routName: (context) => OnBoardingScreen(),
+        LoginScreen.routName: (context) => LoginScreen(),
+        SignupScreen.routName: (context) => SignupScreen(),
+        HomeScreen.routName: (context) => HomeScreen(),
+        TaskScreen.routName: (context) => TaskScreen(),
       },
     );
   }

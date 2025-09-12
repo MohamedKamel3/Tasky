@@ -1,8 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/core/utils/validator.dart';
+import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
 import 'package:to_do_app/features/auth/screens/signup_screen.dart';
 import 'package:to_do_app/features/auth/widgets/member-state-widget.dart';
+import 'package:to_do_app/features/home/screens/home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -61,6 +66,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 10),
                   TextFormFieldHelper(
+                    action: TextInputAction.done,
                     keyboardType: TextInputType.visiblePassword,
                     controller: password,
                     borderRadius: 12,
@@ -70,7 +76,25 @@ class LoginScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 70),
                   MaterialButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        AppDialog.loadingDialog(context: context);
+                        await login(context)
+                            .then((_) {
+                              Navigator.pop(context);
+                              Navigator.of(
+                                context,
+                              ).pushReplacementNamed(HomeScreen.routName);
+                            })
+                            .catchError((e) {
+                              Navigator.pop(context);
+                              AppDialog.errorDialog(
+                                context: context,
+                                message: e.toString(),
+                              );
+                            });
+                      }
+                    },
                     color: Color(0xff5f33e1),
                     minWidth: double.infinity,
                     height: 50,
@@ -104,5 +128,25 @@ class LoginScreen extends StatelessWidget {
             )
           : null,
     );
+  }
+
+  Future<void> login(BuildContext context) async {
+    try {
+      final credential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: email.text,
+            password: password.text,
+          )
+          .then(
+            (value) =>
+                Navigator.of(context).pushReplacementNamed(HomeScreen.routName),
+          );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'user-not-found') {
+        print('No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        print('Wrong password provided for that user.');
+      }
+    }
   }
 }
