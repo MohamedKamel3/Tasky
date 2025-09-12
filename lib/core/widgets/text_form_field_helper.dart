@@ -16,16 +16,18 @@ class TextFormFieldHelper extends StatefulWidget {
   final IconData? icon;
   final TextInputAction? action;
   final FocusNode? focusNode;
-
-  final BorderRadius? borderRadius;
+  final Color? fillColor;
+  final double? hintFontSize;
+  final double borderWidth;
+  final double? borderRadius;
   final bool? isMobile;
+  final double horizontalPadding;
+  final double verticalPadding;
 
-  const TextFormFieldHelper({
+  TextFormFieldHelper({
     super.key,
     this.controller,
-    this.isPassword = false,
     this.hint,
-    this.enabled = true,
     this.obscuringCharacter,
     this.onValidate,
     this.onChanged,
@@ -33,8 +35,6 @@ class TextFormFieldHelper extends StatefulWidget {
     this.onEditingComplete,
     this.onSaved,
     this.onTap,
-    this.maxLines = 1,
-    this.minLines = 1,
     this.maxLength,
     this.keyboardType,
     this.inputFormatters,
@@ -46,6 +46,15 @@ class TextFormFieldHelper extends StatefulWidget {
     this.focusNode,
     this.borderRadius,
     this.isMobile,
+    this.isPassword = false,
+    this.enabled = true,
+    this.maxLines = 1,
+    this.minLines = 1,
+    this.fillColor = Colors.transparent,
+    this.hintFontSize = 16,
+    this.borderWidth = 1,
+    this.horizontalPadding = 10,
+    this.verticalPadding = 10,
   });
 
   @override
@@ -54,7 +63,7 @@ class TextFormFieldHelper extends StatefulWidget {
 
 class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
   late bool obscureText;
-  TextDirection _textDirection = TextDirection.rtl;
+  TextDirection _textDirection = TextDirection.ltr;
 
   @override
   void initState() {
@@ -92,7 +101,6 @@ class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
       maxLength: widget.maxLength,
       obscureText: obscureText,
       obscuringCharacter: widget.obscuringCharacter ?? '*',
-
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
       enabled: widget.enabled,
@@ -105,20 +113,17 @@ class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
         color: Theme.of(context).primaryColor,
         fontWeight: FontWeight.w500,
       ),
-
       textAlign: widget.isMobile != null ? TextAlign.left : TextAlign.start,
-
       textDirection: widget.isMobile != null
           ? TextDirection.ltr
           : _textDirection,
       textAlignVertical: TextAlignVertical.center,
       decoration: InputDecoration(
-        fillColor: Colors.white,
+        fillColor: widget.fillColor,
         filled: true,
         hintText: widget.hint,
-        hintStyle: const TextStyle(
-          fontSize: 16,
-          // fontFamily: FontFamilyHelper.tajawalArabic,
+        hintStyle: TextStyle(
+          fontSize: widget.hintFontSize,
           color: Colors.grey,
           fontWeight: FontWeight.w500,
         ),
@@ -136,15 +141,30 @@ class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
                 ),
               )
             : widget.suffixWidget,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 13,
-          vertical: 10,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: widget.horizontalPadding,
+          vertical: widget.verticalPadding,
         ),
-        border: outlineInputBorder(color: Colors.grey, width: 1),
-        enabledBorder: outlineInputBorder(color: Colors.grey, width: 1),
-        focusedBorder: outlineInputBorder(color: Colors.grey, width: 1),
-        errorBorder: outlineInputBorder(color: Colors.red, width: 1),
-        focusedErrorBorder: outlineInputBorder(color: Colors.red, width: 1),
+        border: outlineInputBorder(
+          color: Colors.grey,
+          width: widget.borderWidth,
+        ),
+        enabledBorder: outlineInputBorder(
+          color: Colors.grey,
+          width: widget.borderWidth,
+        ),
+        focusedBorder: outlineInputBorder(
+          color: Colors.grey,
+          width: widget.borderWidth,
+        ),
+        errorBorder: outlineInputBorder(
+          color: Colors.red,
+          width: widget.borderWidth,
+        ),
+        focusedErrorBorder: outlineInputBorder(
+          color: Colors.red,
+          width: widget.borderWidth,
+        ),
       ),
     );
   }
@@ -154,7 +174,7 @@ class _TextFormFieldHelperState extends State<TextFormFieldHelper> {
     required double width,
   }) {
     return OutlineInputBorder(
-      borderRadius: widget.borderRadius ?? BorderRadius.circular(40),
+      borderRadius: BorderRadius.circular(widget.borderRadius ?? 40),
       borderSide: BorderSide(color: color, width: width),
     );
   }
