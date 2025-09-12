@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/features/auth/screens/login_screen.dart';
 import 'package:to_do_app/features/auth/screens/signup_screen.dart';
@@ -11,11 +12,22 @@ import 'package:firebase_core/firebase_core.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(ToDoApp());
+  var firebase = FirebaseAuth.instance.currentUser?.uid;
+  String routName = firebase == null
+      ? OnBoardingScreen.routName
+      : HomeScreen.routName;
+
+  runApp(
+    ToDoApp(
+      routName: routName,
+    ),
+  );
 }
 
 class ToDoApp extends StatelessWidget {
-  const ToDoApp({super.key});
+  ToDoApp({super.key, required this.routName});
+
+  String routName;
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +35,9 @@ class ToDoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: SplashScreen.routName,
       routes: {
-        SplashScreen.routName: (context) => SplashScreen(),
+        SplashScreen.routName: (context) => SplashScreen(
+          nextRoutName: routName,
+        ),
         OnBoardingScreen.routName: (context) => OnBoardingScreen(),
         LoginScreen.routName: (context) => LoginScreen(),
         SignupScreen.routName: (context) => SignupScreen(),

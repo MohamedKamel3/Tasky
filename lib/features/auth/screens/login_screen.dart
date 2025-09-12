@@ -2,9 +2,11 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:to_do_app/core/firebase/authentication.dart';
 import 'package:to_do_app/core/utils/validator.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
+import 'package:to_do_app/features/auth/data/utils/result_network.dart';
 import 'package:to_do_app/features/auth/screens/signup_screen.dart';
 import 'package:to_do_app/features/auth/widgets/member-state-widget.dart';
 import 'package:to_do_app/features/home/screens/home_screen.dart';
@@ -79,20 +81,7 @@ class LoginScreen extends StatelessWidget {
                     onPressed: () async {
                       if (formKey.currentState!.validate()) {
                         AppDialog.loadingDialog(context: context);
-                        await login(context)
-                            .then((_) {
-                              Navigator.pop(context);
-                              Navigator.of(
-                                context,
-                              ).pushReplacementNamed(HomeScreen.routName);
-                            })
-                            .catchError((e) {
-                              Navigator.pop(context);
-                              AppDialog.errorDialog(
-                                context: context,
-                                message: e.toString(),
-                              );
-                            });
+                        await login(context);
                       }
                     },
                     color: Color(0xff5f33e1),
@@ -131,22 +120,21 @@ class LoginScreen extends StatelessWidget {
   }
 
   Future<void> login(BuildContext context) async {
-    try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-            email: email.text,
-            password: password.text,
-          )
-          .then(
-            (value) =>
-                Navigator.of(context).pushReplacementNamed(HomeScreen.routName),
-          );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-      }
+    Authentication login = AuthEmailAndPassImp(
+      email: email.text,
+      password: password.text,
+    );
+    ResultNetwork result = await login.login();
+    switch (result) {
+      case SuccessNetwork():
+        Navigator.pop(context);
+        Navigator.of(context).pushReplacementNamed(HomeScreen.routName);
+      case ErrorNetwork():
+        Navigator.pop(context);
+        AppDialog.errorDialog(
+          context: context,
+          message: result.exception.toString(),
+        );
     }
   }
 }
