@@ -1,15 +1,14 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/core/firebase/authentication.dart';
 import 'package:to_do_app/core/utils/validator.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
-import 'package:to_do_app/features/auth/data/utils/result_network.dart';
-import 'package:to_do_app/features/auth/screens/signup_screen.dart';
-import 'package:to_do_app/features/auth/widgets/member-state-widget.dart';
-import 'package:to_do_app/features/home/screens/home_screen.dart';
+import 'package:to_do_app/core/utils/result_network.dart';
+import 'package:to_do_app/features/auth/presentation/view/signup_screen.dart';
+import 'package:to_do_app/features/auth/presentation/widgets/member-state-widget.dart';
+import 'package:to_do_app/features/home/presentation/view/home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});

@@ -4,8 +4,6 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_app/core/constants/assets_consts.dart';
 import 'package:to_do_app/core/constants/colors.dart';
-import 'package:to_do_app/features/auth/screens/login_screen.dart';
-import 'package:to_do_app/features/home/screens/on_boarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({super.key, required this.nextRoutName});

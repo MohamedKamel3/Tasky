@@ -1,11 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:to_do_app/features/auth/screens/login_screen.dart';
-import 'package:to_do_app/features/auth/screens/signup_screen.dart';
-import 'package:to_do_app/features/home/screens/home_screen.dart';
-import 'package:to_do_app/features/home/screens/on_boarding_screen.dart';
-import 'package:to_do_app/features/home/screens/splash_screen.dart';
-import 'package:to_do_app/features/home/screens/task_screen.dart';
+import 'package:to_do_app/features/auth/presentation/view/login_screen.dart';
+import 'package:to_do_app/features/auth/presentation/view/signup_screen.dart';
+import 'package:to_do_app/features/home/presentation/view/home_screen.dart';
+import 'package:to_do_app/features/on_boarding/presentation/view/on_boarding_screen.dart';
+import 'package:to_do_app/splash_screen.dart';
+import 'package:to_do_app/features/home/presentation/view/task_screen.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 

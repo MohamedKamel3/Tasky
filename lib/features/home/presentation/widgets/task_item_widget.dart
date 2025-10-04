@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/core/constants/colors.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
-import 'package:to_do_app/features/home/widgets/priority_widget.dart';
+import 'package:to_do_app/features/home/presentation/widgets/priority_widget.dart';
 
 class TaskItemWidget extends StatefulWidget {
   TaskItemWidget({
