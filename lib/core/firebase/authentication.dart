@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:to_do_app/features/auth/data/utils/result_network.dart';
+import 'package:to_do_app/core/utils/result_network.dart';
 
 abstract class Authentication {
   Future<ResultNetwork> login();

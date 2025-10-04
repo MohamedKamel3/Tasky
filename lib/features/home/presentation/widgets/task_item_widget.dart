@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:to_do_app/core/constants/colors.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
-import 'package:to_do_app/features/home/widgets/priority_widget.dart';
+import 'package:to_do_app/features/home/presentation/widgets/priority_widget.dart';
 
 class TaskItemWidget extends StatefulWidget {
   TaskItemWidget({
@@ -28,7 +29,6 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
       onTap: widget.onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        margin: EdgeInsets.only(bottom: 10),
         decoration: widget.withBorder
             ? BoxDecoration(
                 border: Border.all(width: 2, color: Colors.black),
@@ -57,13 +57,13 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    maxLines: 1,
                     widget.taskModel.title!,
+                    maxLines: 1,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
+                    DateFormat('dd/MM/yyyy').format(widget.taskModel.date!),
                     maxLines: 2,
-                    widget.taskModel.description!,
                     style: TextStyle(fontSize: 16),
                   ),
                 ],
