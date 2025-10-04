@@ -1,8 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:to_do_app/core/firebase/auth_firebase.dart';
-import 'package:to_do_app/core/firebase/authentication.dart';
+import 'package:to_do_app/features/auth/data/firebase/auth_firebase.dart';
+import 'package:to_do_app/features/auth/data/firebase/authentication.dart';
 import 'package:to_do_app/core/utils/result_network.dart';
 import 'package:to_do_app/core/utils/validator.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
