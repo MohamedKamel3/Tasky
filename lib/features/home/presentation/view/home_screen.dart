@@ -6,7 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:to_do_app/core/constants/colors.dart';
-import 'package:to_do_app/features/auth/data/firebase/firebase_firestore.dart';
+import 'package:to_do_app/features/home/data/firebase/task_firebase.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
 import 'package:to_do_app/features/auth/presentation/view/login_screen.dart';
