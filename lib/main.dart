@@ -16,7 +16,6 @@ void main() async {
   String routName = firebase == null
       ? OnBoardingScreen.routName
       : HomeScreen.routName;
-
   runApp(
     ToDoApp(
       routName: routName,
