@@ -2,23 +2,33 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:to_do_app/core/firebase/auth_firebase.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_app/core/utils/validator.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
-import 'package:to_do_app/features/auth/data/models/user_model.dart';
-import 'package:to_do_app/features/auth/screens/login_screen.dart';
-import 'package:to_do_app/features/auth/widgets/member-state-widget.dart';
+import 'package:to_do_app/core/widgets/toastification.dart';
+import 'package:to_do_app/features/auth/data/repo/data_source/auth_data_source_impl.dart';
+import 'package:to_do_app/features/auth/data/repo/repository/auth_repisitory_impl.dart';
+import 'package:to_do_app/features/auth/presentation/view_model/auth/auth_cubit.dart';
+import 'package:to_do_app/features/auth/presentation/widgets/member-state-widget.dart';
 
-class SignupScreen extends StatelessWidget {
-  SignupScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
   static const String routName = "SignupScreen";
+
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
   var formKey = GlobalKey<FormState>();
   var email = TextEditingController();
   var password = TextEditingController();
   var confirmPassword = TextEditingController();
   var name = TextEditingController();
-
+  var cubit = AuthCubit(
+    injectableAuthRepisitory(injectableAuthEmailAndPassDataSource()),
+  );
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,45 +123,61 @@ class SignupScreen extends StatelessWidget {
                       Validator.validateConfirmPassword(val, password.text),
                 ),
                 SizedBox(height: 50),
-                MaterialButton(
-                  onPressed: () async {
-                    if (formKey.currentState!.validate()) {
+                BlocListener<AuthCubit, AuthState>(
+                  bloc: cubit,
+                  listener: (context, state) {
+                    if (state is AuthFailure ||
+                        state is AuthSuccess ||
+                        state is UserFailure ||
+                        state is UserSuccess) {
+                      Navigator.pop(context);
+                      if (state is AuthSuccess) {
+                      } else if (state is AuthFailure) {
+                        AppToastification.errorToastification(
+                          title: "Error",
+                          context: context,
+                          description: state.message,
+                        );
+                      } else if (state is UserSuccess) {
+                        AppToastification.successToastification(
+                          title: "Success",
+                          context: context,
+                          description: "Account has been created successfully",
+                        );
+                        Navigator.of(context).pop();
+                      } else if (state is UserFailure) {
+                        AppToastification.errorToastification(
+                          title: "Error",
+                          context: context,
+                          description: state.message,
+                        );
+                      }
+                    } else {
                       AppDialog.loadingDialog(context: context);
-                      await _signUp()
-                          .then((value) {
-                            Navigator.of(context).pop();
-                            AuthFirebase.addUser(
-                              UserModel(name: name.text, email: email.text),
-                            );
-                            Navigator.of(context).pushAndRemoveUntil(
-                              MaterialPageRoute(
-                                builder: (context) => LoginScreen(),
-                              ),
-                              (route) => false,
-                            );
-                            ();
-                          })
-                          .catchError((e) {
-                            Navigator.of(context).pop();
-                            AppDialog.errorDialog(
-                              context: context,
-                              message: e.toString(),
-                            );
-                          });
                     }
                   },
-                  color: Color(0xff5f33e1),
-                  minWidth: double.infinity,
-                  height: 50,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    "Register",
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.white,
-                      fontWeight: FontWeight.normal,
+                  child: MaterialButton(
+                    onPressed: () async {
+                      if (formKey.currentState!.validate()) {
+                        await cubit.signUp(email.text, password.text);
+                        if (FirebaseAuth.instance.currentUser?.uid != null) {
+                          await cubit.addUser(email.text, name.text);
+                        }
+                      }
+                    },
+                    color: Color(0xff5f33e1),
+                    minWidth: double.infinity,
+                    height: 50,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      "Register",
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.white,
+                        fontWeight: FontWeight.normal,
+                      ),
                     ),
                   ),
                 ),
@@ -172,21 +198,7 @@ class SignupScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _signUp() async {
-    try {
-      final credential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
-            email: email.text,
-            password: password.text,
-          );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
-    } catch (e) {
-      print(e);
-    }
-  }
+  // AuthFirebase.addUser(
+  //   UserModel(name: name.text, email: email.text),
+  // );
 }

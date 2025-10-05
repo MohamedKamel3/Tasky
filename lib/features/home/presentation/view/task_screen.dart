@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:to_do_app/core/constants/colors.dart';
-import 'package:to_do_app/core/firebase/firebase_firestore.dart';
+import 'package:to_do_app/features/home/data/firebase/task_firebase.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
-import 'package:to_do_app/features/home/widgets/custom_radio_button.dart';
-import 'package:to_do_app/features/home/widgets/edit_task_dialog_widget.dart';
-import 'package:to_do_app/features/home/widgets/show_priority_dialog.dart';
+import 'package:to_do_app/features/home/presentation/widgets/custom_radio_button.dart';
+import 'package:to_do_app/features/home/presentation/widgets/edit_task_dialog_widget.dart';
+import 'package:to_do_app/features/home/presentation/widgets/show_priority_dialog.dart';
 
 class TaskScreen extends StatefulWidget {
   const TaskScreen({super.key});

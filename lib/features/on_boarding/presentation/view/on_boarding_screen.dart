@@ -2,8 +2,8 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:to_do_app/core/constants/colors.dart';
-import 'package:to_do_app/features/auth/data/models/on_boarding_model.dart';
-import 'package:to_do_app/features/auth/screens/login_screen.dart';
+import 'package:to_do_app/features/on_boarding/data/models/on_boarding_model.dart';
+import 'package:to_do_app/features/auth/presentation/view/login_screen.dart';
 
 class OnBoardingScreen extends StatefulWidget {
   OnBoardingScreen({super.key});

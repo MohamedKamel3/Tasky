@@ -1,13 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:to_do_app/core/widgets/toastification.dart';
 import 'package:to_do_app/core/utils/validator.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
-import 'package:to_do_app/features/auth/screens/signup_screen.dart';
-import 'package:to_do_app/features/auth/widgets/member-state-widget.dart';
-import 'package:to_do_app/features/home/screens/home_screen.dart';
+import 'package:to_do_app/features/auth/data/repo/data_source/auth_data_source_impl.dart';
+import 'package:to_do_app/features/auth/data/repo/repository/auth_repisitory_impl.dart';
+import 'package:to_do_app/features/auth/presentation/view/signup_screen.dart';
+import 'package:to_do_app/features/auth/presentation/view_model/auth/auth_cubit.dart';
+import 'package:to_do_app/features/auth/presentation/widgets/member-state-widget.dart';
+import 'package:to_do_app/features/home/presentation/view/home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
@@ -15,6 +19,12 @@ class LoginScreen extends StatelessWidget {
   var formKey = GlobalKey<FormState>();
   var email = TextEditingController();
   var password = TextEditingController();
+
+  var cubit = AuthCubit(
+    injectableAuthRepisitory(
+      injectableAuthEmailAndPassDataSource(),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -75,38 +85,49 @@ class LoginScreen extends StatelessWidget {
                     onValidate: Validator.validatePassword,
                   ),
                   SizedBox(height: 70),
-                  MaterialButton(
-                    onPressed: () async {
-                      if (formKey.currentState!.validate()) {
+                  BlocListener<AuthCubit, AuthState>(
+                    bloc: cubit,
+                    listener: (context, state) {
+                      if (cubit.state is AuthSuccess) {
+                        Navigator.pop(context);
+                        AppToastification.successToastification(
+                          title: "Success",
+                          description: "Login successfully",
+                          context: context,
+                        );
+                        Navigator.of(
+                          context,
+                        ).pushReplacementNamed(HomeScreen.routName);
+                      } else if (cubit.state is AuthFailure) {
+                        Navigator.pop(context);
+                        AppToastification.errorToastification(
+                          title: "Error",
+                          description: "Login failed, try again",
+                          context: context,
+                        );
+                      } else {
                         AppDialog.loadingDialog(context: context);
-                        await login(context)
-                            .then((_) {
-                              Navigator.pop(context);
-                              Navigator.of(
-                                context,
-                              ).pushReplacementNamed(HomeScreen.routName);
-                            })
-                            .catchError((e) {
-                              Navigator.pop(context);
-                              AppDialog.errorDialog(
-                                context: context,
-                                message: e.toString(),
-                              );
-                            });
                       }
                     },
-                    color: Color(0xff5f33e1),
-                    minWidth: double.infinity,
-                    height: 50,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      "Login",
-                      style: TextStyle(
-                        fontSize: 24,
-                        color: Colors.white,
-                        fontWeight: FontWeight.normal,
+                    child: MaterialButton(
+                      onPressed: () async {
+                        if (formKey.currentState!.validate()) {
+                          await cubit.login(email.text, password.text);
+                        }
+                      },
+                      color: Color(0xff5f33e1),
+                      minWidth: double.infinity,
+                      height: 50,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        "Login",
+                        style: TextStyle(
+                          fontSize: 24,
+                          color: Colors.white,
+                          fontWeight: FontWeight.normal,
+                        ),
                       ),
                     ),
                   ),
@@ -128,25 +149,5 @@ class LoginScreen extends StatelessWidget {
             )
           : null,
     );
-  }
-
-  Future<void> login(BuildContext context) async {
-    try {
-      final credential = await FirebaseAuth.instance
-          .signInWithEmailAndPassword(
-            email: email.text,
-            password: password.text,
-          )
-          .then(
-            (value) =>
-                Navigator.of(context).pushReplacementNamed(HomeScreen.routName),
-          );
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
-      }
-    }
   }
 }

@@ -6,16 +6,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:to_do_app/core/constants/colors.dart';
-import 'package:to_do_app/core/firebase/firebase_firestore.dart';
+import 'package:to_do_app/features/home/data/firebase/task_firebase.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
-import 'package:to_do_app/features/auth/screens/login_screen.dart';
+import 'package:to_do_app/features/auth/presentation/view/login_screen.dart';
 import 'package:to_do_app/features/home/data/models/date_filter_model.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
-import 'package:to_do_app/features/home/screens/task_screen.dart';
-import 'package:to_do_app/features/home/widgets/show_modal_bottom_sheet.dart';
-import 'package:to_do_app/features/home/widgets/show_priority_dialog.dart';
-import 'package:to_do_app/features/home/widgets/task_item_widget.dart';
+import 'package:to_do_app/features/home/presentation/view/task_screen.dart';
+import 'package:to_do_app/features/home/presentation/widgets/show_modal_bottom_sheet.dart';
+import 'package:to_do_app/features/home/presentation/widgets/show_priority_dialog.dart';
+import 'package:to_do_app/features/home/presentation/widgets/task_item_widget.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

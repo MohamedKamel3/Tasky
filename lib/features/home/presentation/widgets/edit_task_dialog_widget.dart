@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_app/core/utils/validator.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
 
