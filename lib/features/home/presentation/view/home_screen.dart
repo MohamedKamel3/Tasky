@@ -176,42 +176,64 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           ...tasks.map((task) {
                             return Slidable(
+                              key: ValueKey(task.id),
                               endActionPane: ActionPane(
-                                motion: const ScrollMotion(),
+                                motion: const StretchMotion(),
                                 children: [
                                   SlidableAction(
                                     onPressed: (context) async {
                                       await TaskFirebase.deleteTask(task);
                                       setState(() {});
                                     },
-                                    backgroundColor: const Color(0xFFFE4A49),
+                                    backgroundColor: const Color(0xFFFF4C4C),
                                     foregroundColor: Colors.white,
-                                    icon: Icons.delete,
+                                    icon: Icons.delete_outline,
                                     label: 'Delete',
+                                    borderRadius: BorderRadius.circular(
+                                      15,
+                                    ),
+                                    spacing: 3,
                                   ),
                                 ],
                               ),
-                              child: TaskItemWidget(
-                                onTap: () {
-                                  Navigator.of(context)
-                                      .pushNamed(
-                                        TaskScreen.routName,
-                                        arguments: task,
-                                      )
-                                      .then((value) {
-                                        if (value == true) {
-                                          setState(() {});
-                                        }
-                                      });
-                                },
-                                taskModel: task,
-                                callBack: (isCompleted) async {
-                                  task.isDone = isCompleted;
-                                  await TaskFirebase.updateTask(task);
-                                  setState(() {});
-                                },
+                              child: Container(
+                                margin: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(15),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.05),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: TaskItemWidget(
+                                  onTap: () {
+                                    Navigator.of(context)
+                                        .pushNamed(
+                                          TaskScreen.routName,
+                                          arguments: task,
+                                        )
+                                        .then((value) {
+                                          if (value == true) {
+                                            setState(() {});
+                                          }
+                                        });
+                                  },
+                                  taskModel: task,
+                                  callBack: (isCompleted) async {
+                                    task.isDone = isCompleted;
+                                    await TaskFirebase.updateTask(task);
+                                    setState(() {});
+                                  },
+                                ),
                               ),
                             );
+                            ;
                           }),
                           if (completedTasks.isNotEmpty) ...[
                             const SizedBox(height: 20),

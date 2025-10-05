@@ -29,7 +29,6 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
       onTap: widget.onTap,
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-        margin: EdgeInsets.only(bottom: 10),
         decoration: widget.withBorder
             ? BoxDecoration(
                 border: Border.all(width: 2, color: Colors.black),
