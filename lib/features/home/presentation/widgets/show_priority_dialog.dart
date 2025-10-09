@@ -42,7 +42,6 @@ class _ShowPriorityDialogState extends State<ShowPriorityDialog> {
             return GestureDetector(
               onTap: () {
                 widget.selectedPriority = e;
-                widget.callBack(widget.selectedPriority);
                 setState(() {});
               },
               child: Container(

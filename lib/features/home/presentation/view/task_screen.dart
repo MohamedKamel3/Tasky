@@ -5,6 +5,8 @@ import 'package:to_do_app/core/constants/colors.dart';
 import 'package:to_do_app/features/home/data/firebase/task_firebase.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
+import 'package:to_do_app/features/home/data/repo/repository/home_repository_impl.dart';
+import 'package:to_do_app/features/home/presentation/view_model/home_cubit.dart';
 import 'package:to_do_app/features/home/presentation/widgets/custom_radio_button.dart';
 import 'package:to_do_app/features/home/presentation/widgets/edit_task_dialog_widget.dart';
 import 'package:to_do_app/features/home/presentation/widgets/show_priority_dialog.dart';
@@ -24,6 +26,7 @@ class _TaskScreenState extends State<TaskScreen> {
 
   bool originalDone = false;
   TaskModel? task;
+  HomeCubit homeCubit = HomeCubit(injectableHomeRepository());
 
   @override
   void didChangeDependencies() {
@@ -195,11 +198,9 @@ class _TaskScreenState extends State<TaskScreen> {
               MaterialButton(
                 onPressed: () async {
                   AppDialog.loadingDialog(context: context);
-                  await TaskFirebase.deleteTask(task!).then((_) {
+                  await homeCubit.deleteTask(task!).then((_) {
                     Navigator.pop(context);
-                    setState(() {
-                      Navigator.pop(context, true);
-                    });
+                    Navigator.pop(context, true);
                   });
                 },
                 child: Row(
@@ -229,7 +230,7 @@ class _TaskScreenState extends State<TaskScreen> {
           onPressed: () async {
             AppDialog.loadingDialog(context: context);
             task!.isDone = originalDone;
-            await TaskFirebase.updateTask(task!).then((_) {
+            await homeCubit.updateTask(task!).then((_) {
               Navigator.pop(context);
               Navigator.pop(context, true);
               setState(() {});
