@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/core/constants/colors.dart';
 
 class PriorityWidget extends StatelessWidget {
   const PriorityWidget({super.key, required this.priority});
@@ -15,7 +16,10 @@ class PriorityWidget extends StatelessWidget {
       child: Row(
         spacing: 10,
         children: [
-          Image.asset("assets/icons/flag.png"),
+          Image.asset(
+            "assets/icons/flag.png",
+            color: priorityColors[priority - 1],
+          ),
           Text(
             priority.toString(),
             style: TextStyle(

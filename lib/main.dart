@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_app/features/auth/presentation/view/login_screen.dart';
 import 'package:to_do_app/features/auth/presentation/view/signup_screen.dart';
+import 'package:to_do_app/features/home/data/repo/repository/home_repository_impl.dart';
 import 'package:to_do_app/features/home/presentation/view/home_screen.dart';
+import 'package:to_do_app/features/home/presentation/view_model/home_cubit.dart';
 import 'package:to_do_app/features/on_boarding/presentation/view/on_boarding_screen.dart';
 import 'package:to_do_app/splash_screen.dart';
 import 'package:to_do_app/features/home/presentation/view/task_screen.dart';
@@ -25,7 +28,6 @@ void main() async {
 
 class ToDoApp extends StatelessWidget {
   ToDoApp({super.key, required this.routName});
-
   String routName;
 
   @override
