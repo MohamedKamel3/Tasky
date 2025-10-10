@@ -12,6 +12,9 @@ class HomeCubit extends Cubit<HomeState> {
   HomeRepository homeRepository;
   List<TaskModel> tasks = [];
   List<TaskModel> completedTasks = [];
+  DateFilterModel selectedDateFilter = DateFilterModel.all;
+  DateTime? selectedDateFilterDate = DateTime.now();
+  String? searchString;
 
   Future<void> getTasksFiltered({
     DateTime? date,

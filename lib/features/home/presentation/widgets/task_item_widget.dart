@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:to_do_app/core/constants/colors.dart';
+import 'package:to_do_app/core/utils/show_date.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
 import 'package:to_do_app/features/home/presentation/widgets/priority_widget.dart';
 
@@ -62,7 +63,7 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    DateFormat('dd/MM/yyyy').format(widget.taskModel.date!),
+                    showDate(widget.taskModel.date!),
                     maxLines: 2,
                     style: TextStyle(fontSize: 16),
                   ),

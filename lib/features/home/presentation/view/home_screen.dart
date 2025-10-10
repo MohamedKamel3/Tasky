@@ -32,13 +32,19 @@ class _HomeScreenState extends State<HomeScreen> {
   var title = TextEditingController();
   var description = TextEditingController();
   var searchController = TextEditingController();
-  DateTime? selectedDate = DateTime.now();
-  int selectedPriority = 1;
-  DateFilterModel selectedDateFilter = DateFilterModel.all;
-  DateTime? selectedDateFilterDate = DateTime.now();
-  String? searchString;
-  HomeCubit cubit = HomeCubit(injectableHomeRepository());
+  var searchTextNotifier = ValueNotifier<String>("");
+  ValueNotifier<DateTime> selectedDate = ValueNotifier(DateTime.now());
+  ValueNotifier<int> selectedPriority = ValueNotifier(1);
   ValueNotifier<int?> selectedPriorityFilterNotifier = ValueNotifier(null);
+  HomeCubit cubit = HomeCubit(injectableHomeRepository());
+
+  @override
+  void initState() {
+    super.initState();
+    searchController.addListener(() {
+      searchTextNotifier.value = searchController.text;
+    });
+  }
 
   @override
   void dispose() {
@@ -50,27 +56,51 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: _appBar(context),
+      appBar: _appBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           spacing: 15,
           children: [
-            TextFormFieldHelper(
-              action: TextInputAction.done,
-              verticalPadding: 15,
-              hint: "Search for your task...",
-              controller: searchController,
-              prefixIcon: Image.asset("assets/icons/search.png"),
-              borderRadius: 10,
-              borderWidth: 2,
-              onChanged: (val) async {
-                searchString = val;
-                await cubit.getTasksFiltered(
-                  date: selectedDateFilterDate!,
-                  filter: selectedDateFilter,
-                  priority: selectedPriorityFilterNotifier.value,
-                  search: searchString,
+            ValueListenableBuilder(
+              valueListenable: searchTextNotifier,
+              builder: (context, value, _) {
+                return TextFormFieldHelper(
+                  action: TextInputAction.done,
+                  verticalPadding: 15,
+                  hint: "Search for your task...",
+                  controller: searchController,
+                  prefixIcon: Image.asset("assets/icons/search.png"),
+                  borderRadius: 10,
+                  borderWidth: 2,
+                  suffixWidget: value.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(
+                            Icons.close,
+                            color: Colors.grey,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            searchController.clear();
+                            cubit.searchString = "";
+                            cubit.getTasksFiltered(
+                              date: cubit.selectedDateFilterDate!,
+                              filter: cubit.selectedDateFilter,
+                              priority: selectedPriorityFilterNotifier.value,
+                              search: cubit.searchString,
+                            );
+                          },
+                        )
+                      : null,
+                  onChanged: (val) async {
+                    cubit.searchString = val;
+                    await cubit.getTasksFiltered(
+                      date: cubit.selectedDateFilterDate!,
+                      filter: cubit.selectedDateFilter,
+                      priority: selectedPriorityFilterNotifier.value,
+                      search: cubit.searchString,
+                    );
+                  },
                 );
               },
             ),
@@ -98,11 +128,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       leadingIcon: Image.asset("assets/icons/date.png"),
                       dropdownMenuEntries: DateFilterModel.entries,
                       onSelected: (value) async {
-                        selectedDateFilter = value!;
+                        cubit.selectedDateFilter = value!;
                         if (value == DateFilterModel.day) {
-                          selectedDateFilterDate =
+                          cubit.selectedDateFilterDate =
                               await showDatePicker(
-                                initialDate: selectedDateFilterDate,
+                                initialDate: cubit.selectedDateFilterDate,
                                 context: context,
                                 firstDate: DateTime.now().subtract(
                                   const Duration(days: 365),
@@ -111,13 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                   const Duration(days: 350),
                                 ),
                               ) ??
-                              selectedDateFilterDate;
+                              cubit.selectedDateFilterDate;
                         }
                         await cubit.getTasksFiltered(
-                          date: selectedDateFilterDate,
-                          filter: selectedDateFilter,
+                          date: cubit.selectedDateFilterDate,
+                          filter: cubit.selectedDateFilter,
                           priority: selectedPriorityFilterNotifier.value,
-                          search: searchString,
+                          search: cubit.searchString,
                         );
                       },
                     ),
@@ -127,10 +157,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: () async {
                               selectedPriorityFilterNotifier.value = null;
                               await cubit.getTasksFiltered(
-                                date: selectedDateFilterDate!,
-                                filter: selectedDateFilter,
+                                date: cubit.selectedDateFilterDate!,
+                                filter: cubit.selectedDateFilter,
                                 priority: selectedPriorityFilterNotifier.value,
-                                search: searchString,
+                                search: cubit.searchString,
                               );
                             },
                             child: Text(
@@ -145,7 +175,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         vertical: 15,
                       ),
                       onPressed: () async => await showDialog(
-                        barrierDismissible: false,
                         context: context,
                         builder: (context) => ShowPriorityDialog(
                           selectedPriority:
@@ -153,10 +182,10 @@ class _HomeScreenState extends State<HomeScreen> {
                           callBack: (int p1) async {
                             selectedPriorityFilterNotifier.value = p1;
                             await cubit.getTasksFiltered(
-                              date: selectedDateFilterDate!,
-                              filter: selectedDateFilter,
+                              date: cubit.selectedDateFilterDate!,
+                              filter: cubit.selectedDateFilter,
                               priority: selectedPriorityFilterNotifier.value,
-                              search: searchString,
+                              search: cubit.searchString,
                             );
                           },
                         ),
@@ -275,12 +304,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         onPressed: (context) async {
                                           await cubit.deleteTask(task);
                                           await cubit.getTasksFiltered(
-                                            date: selectedDateFilterDate!,
-                                            filter: selectedDateFilter,
+                                            date: cubit.selectedDateFilterDate!,
+                                            filter: cubit.selectedDateFilter,
                                             priority:
                                                 selectedPriorityFilterNotifier
                                                     .value,
-                                            search: searchString,
+                                            search: cubit.searchString,
                                           );
                                         },
                                         backgroundColor: const Color(
@@ -320,12 +349,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           .then((value) async {
                                             if (value == true) {
                                               await cubit.getTasksFiltered(
-                                                date: selectedDateFilterDate!,
-                                                filter: selectedDateFilter,
+                                                date: cubit
+                                                    .selectedDateFilterDate!,
+                                                filter:
+                                                    cubit.selectedDateFilter,
                                                 priority:
                                                     selectedPriorityFilterNotifier
                                                         .value,
-                                                search: searchString,
+                                                search: cubit.searchString,
                                               );
                                             }
                                           });
@@ -335,11 +366,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       task.isDone = isCompleted;
                                       await cubit.updateTask(task);
                                       await cubit.getTasksFiltered(
-                                        date: selectedDateFilterDate!,
-                                        filter: selectedDateFilter,
+                                        date: cubit.selectedDateFilterDate!,
+                                        filter: cubit.selectedDateFilter,
                                         priority: selectedPriorityFilterNotifier
                                             .value,
-                                        search: searchString,
+                                        search: cubit.searchString,
                                       );
                                     },
                                   ),
@@ -388,12 +419,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                         onPressed: (context) async {
                                           await cubit.deleteTask(task);
                                           await cubit.getTasksFiltered(
-                                            date: selectedDateFilterDate!,
-                                            filter: selectedDateFilter,
+                                            date: cubit.selectedDateFilterDate!,
+                                            filter: cubit.selectedDateFilter,
                                             priority:
                                                 selectedPriorityFilterNotifier
                                                     .value,
-                                            search: searchString,
+                                            search: cubit.searchString,
                                           );
                                         },
                                         backgroundColor: const Color(
@@ -433,12 +464,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                           .then((value) async {
                                             if (value == true) {
                                               await cubit.getTasksFiltered(
-                                                date: selectedDateFilterDate!,
-                                                filter: selectedDateFilter,
+                                                date: cubit
+                                                    .selectedDateFilterDate!,
+                                                filter:
+                                                    cubit.selectedDateFilter,
                                                 priority:
                                                     selectedPriorityFilterNotifier
                                                         .value,
-                                                search: searchString,
+                                                search: cubit.searchString,
                                               );
                                             }
                                           });
@@ -448,11 +481,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                       task.isDone = isCompleted;
                                       await cubit.updateTask(task);
                                       await cubit.getTasksFiltered(
-                                        date: selectedDateFilterDate!,
-                                        filter: selectedDateFilter,
+                                        date: cubit.selectedDateFilterDate!,
+                                        filter: cubit.selectedDateFilter,
                                         priority: selectedPriorityFilterNotifier
                                             .value,
-                                        search: searchString,
+                                        search: cubit.searchString,
                                       );
                                     },
                                   ),
@@ -487,23 +520,25 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context) {
             return ShowModalBottomSheet(
               selectedPriority: selectedPriority,
+              title: title,
+              description: description,
+              selectedDate: selectedDate,
               onTapDate: () async {
-                selectedDate =
+                selectedDate.value =
                     await showDatePicker(
-                      initialDate: selectedDate,
+                      initialDate: selectedDate.value,
                       context: context,
                       firstDate: DateTime.now(),
                       lastDate: DateTime.now().add(const Duration(days: 365)),
                     ) ??
-                    selectedDate;
+                    selectedDate.value;
               },
               onTapPriority: () async => await showDialog(
-                barrierDismissible: false,
                 context: context,
                 builder: (context) => ShowPriorityDialog(
-                  selectedPriority: selectedPriority,
+                  selectedPriority: selectedPriority.value,
                   callBack: (int p1) {
-                    selectedPriority = p1;
+                    selectedPriority.value = p1;
                   },
                 ),
               ),
@@ -514,29 +549,30 @@ class _HomeScreenState extends State<HomeScreen> {
                       TaskModel(
                         title: title.text,
                         description: description.text,
-                        date: selectedDate,
-                        priority: selectedPriority,
+                        date: selectedDate.value,
+                        priority: selectedPriority.value,
                         isDone: false,
                       ),
                     )
                     .then((_) async {
-                      title.clear();
-                      description.clear();
-                      selectedPriority = 1;
-                      selectedDate = DateTime.now();
                       Navigator.of(context).pop();
                       Navigator.of(context).pop();
                       await cubit.getTasksFiltered(
-                        date: selectedDateFilterDate!,
-                        filter: selectedDateFilter,
+                        date: cubit.selectedDateFilterDate!,
+                        filter: cubit.selectedDateFilter,
                         priority: selectedPriorityFilterNotifier.value,
-                        search: searchString,
+                        search: cubit.searchString,
                       );
                     });
               },
-              title: title,
-              description: description,
             );
+          },
+        ).then(
+          (value) {
+            title.clear();
+            description.clear();
+            selectedPriority = ValueNotifier(1);
+            selectedDate = ValueNotifier(DateTime.now());
           },
         );
       },
@@ -571,7 +607,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  AppBar _appBar(BuildContext context) {
+  AppBar _appBar() {
     return AppBar(
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
