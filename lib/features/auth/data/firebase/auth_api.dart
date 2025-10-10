@@ -1,21 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:to_do_app/core/utils/result_network.dart';
 
-abstract class Authentication {
-  Future<ResultNetwork> login();
-  Future<ResultNetwork> signup();
-}
+class AuthAPI {
+  AuthAPI._();
+  static AuthAPI? _instance;
+  static AuthAPI get instance => _instance ?? AuthAPI._();
 
-class AuthEmailAndPassImp implements Authentication {
-  AuthEmailAndPassImp({
-    required this.email,
-    required this.password,
-  });
-  String email;
-  String password;
-
-  @override
-  Future<ResultNetwork<UserCredential>> login() async {
+  Future<ResultNetwork<UserCredential>> login(
+    String email,
+    String password,
+  ) async {
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -37,8 +31,10 @@ class AuthEmailAndPassImp implements Authentication {
     }
   }
 
-  @override
-  Future<ResultNetwork<UserCredential>> signup() async {
+  Future<ResultNetwork<UserCredential>> signup(
+    String email,
+    String password,
+  ) async {
     try {
       final credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
