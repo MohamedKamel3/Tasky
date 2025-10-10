@@ -32,6 +32,18 @@ class HomeRepositoryImpl implements HomeRepository {
   @override
   Future<ResultNetwork<void>> updateTask(TaskModel taskModel) =>
       homeDataSource.updateTask(taskModel);
+
+  @override
+  Future<ResultNetwork<void>> addTaskToRecovery(TaskModel taskModel) =>
+      homeDataSource.addTaskToRecovery(taskModel);
+
+  @override
+  Future<ResultNetwork<void>> deleteRecoverTask(TaskModel taskModel) =>
+      homeDataSource.deleteRecoverTask(taskModel);
+
+  @override
+  Future<ResultNetwork<List<TaskModel>>> getRecoverTasks() =>
+      homeDataSource.getRecoverTasks();
 }
 
 HomeRepository injectableHomeRepository() =>

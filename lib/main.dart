@@ -1,11 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:to_do_app/features/auth/presentation/view/login_screen.dart';
 import 'package:to_do_app/features/auth/presentation/view/signup_screen.dart';
-import 'package:to_do_app/features/home/data/repo/repository/home_repository_impl.dart';
 import 'package:to_do_app/features/home/presentation/view/home_screen.dart';
-import 'package:to_do_app/features/home/presentation/view_model/home_cubit.dart';
+import 'package:to_do_app/features/home/presentation/view/recovery_screen.dart';
 import 'package:to_do_app/features/on_boarding/presentation/view/on_boarding_screen.dart';
 import 'package:to_do_app/splash_screen.dart';
 import 'package:to_do_app/features/home/presentation/view/task_screen.dart';
@@ -36,14 +34,14 @@ class ToDoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: SplashScreen.routName,
       routes: {
-        SplashScreen.routName: (context) => SplashScreen(
-          nextRoutName: routName,
-        ),
+        SplashScreen.routName: (context) =>
+            SplashScreen(nextRoutName: routName),
         OnBoardingScreen.routName: (context) => OnBoardingScreen(),
         LoginScreen.routName: (context) => LoginScreen(),
         SignupScreen.routName: (context) => SignupScreen(),
         HomeScreen.routName: (context) => HomeScreen(),
         TaskScreen.routName: (context) => TaskScreen(),
+        RecoveryScreen.routName: (context) => RecoveryScreen(),
       },
     );
   }

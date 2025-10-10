@@ -15,4 +15,10 @@ abstract class HomeRepository {
   Future<ResultNetwork<void>> updateTask(TaskModel taskModel);
 
   Future<ResultNetwork<void>> deleteTask(TaskModel taskModel);
+
+  Future<ResultNetwork<void>> addTaskToRecovery(TaskModel taskModel);
+
+  Future<ResultNetwork<List<TaskModel>>> getRecoverTasks();
+
+  Future<ResultNetwork<void>> deleteRecoverTask(TaskModel taskModel);
 }

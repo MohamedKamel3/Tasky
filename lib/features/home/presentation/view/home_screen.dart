@@ -7,13 +7,13 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:to_do_app/core/constants/colors.dart';
 import 'package:to_do_app/core/widgets/toastification.dart';
-import 'package:to_do_app/features/home/data/firebase/task_firebase.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
 import 'package:to_do_app/features/auth/presentation/view/login_screen.dart';
 import 'package:to_do_app/features/home/data/models/date_filter_model.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
 import 'package:to_do_app/features/home/data/repo/repository/home_repository_impl.dart';
+import 'package:to_do_app/features/home/presentation/view/recovery_screen.dart';
 import 'package:to_do_app/features/home/presentation/view/task_screen.dart';
 import 'package:to_do_app/features/home/presentation/view_model/home_cubit.dart';
 import 'package:to_do_app/features/home/presentation/widgets/show_modal_bottom_sheet.dart';
@@ -50,6 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
   void dispose() {
     super.dispose();
     selectedPriorityFilterNotifier.dispose();
+    searchTextNotifier.dispose();
+    searchController.dispose();
+    title.dispose();
+    description.dispose();
+    selectedDate.dispose();
+    selectedPriority.dispose();
+    cubit.close();
   }
 
   @override
@@ -234,31 +241,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         return Skeletonizer(
                           enabled: true,
-                          child: Container(
-                            margin: const EdgeInsets.symmetric(
-                              horizontal: 10,
+                          child: TaskItemWidget(
+                            taskModel: TaskModel(
+                              title: "title",
+                              description: "description",
+                              date: DateTime.now(),
+                              priority: 1,
+                              isDone: false,
                             ),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 6,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: TaskItemWidget(
-                              taskModel: TaskModel(
-                                title: "title",
-                                description: "description",
-                                date: DateTime.now(),
-                                priority: 1,
-                                isDone: false,
-                              ),
-                              callBack: (bool p1) {},
-                            ),
+                            callBack: (bool p1) {},
                           ),
                         );
                       },
@@ -303,6 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: SlidableAction(
                                         onPressed: (context) async {
                                           await cubit.deleteTask(task);
+                                          await cubit.addTaskToRecovery(task);
                                           await cubit.getTasksFiltered(
                                             date: cubit.selectedDateFilterDate!,
                                             filter: cubit.selectedDateFilter,
@@ -418,6 +410,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: SlidableAction(
                                         onPressed: (context) async {
                                           await cubit.deleteTask(task);
+                                          await cubit.addTaskToRecovery(task);
                                           await cubit.getTasksFiltered(
                                             date: cubit.selectedDateFilterDate!,
                                             filter: cubit.selectedDateFilter,
@@ -612,9 +605,31 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Colors.white,
       automaticallyImplyLeading: false,
       title: Row(
+        spacing: 15,
         children: [
           Image.asset("assets/icons/tasky.png", height: 50, width: 100),
           Spacer(),
+          GestureDetector(
+            onTap: () async {
+              Navigator.of(context).pushNamed(RecoveryScreen.routName).then((
+                value,
+              ) async {
+                if (value == true) {
+                  await cubit.getTasksFiltered(
+                    date: cubit.selectedDateFilterDate!,
+                    filter: cubit.selectedDateFilter,
+                    priority: selectedPriorityFilterNotifier.value,
+                    search: cubit.searchString,
+                  );
+                }
+              });
+            },
+            child: Icon(
+              Icons.folder_delete_outlined,
+              color: Colors.redAccent,
+              size: 30,
+            ),
+          ),
           GestureDetector(
             onTap: () async {
               AppDialog.loadingDialog(context: context);

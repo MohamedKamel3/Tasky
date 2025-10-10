@@ -1,5 +1,5 @@
-import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:bloc/bloc.dart';
 import 'package:to_do_app/core/utils/result_network.dart';
 import 'package:to_do_app/features/home/data/models/date_filter_model.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
@@ -12,6 +12,7 @@ class HomeCubit extends Cubit<HomeState> {
   HomeRepository homeRepository;
   List<TaskModel> tasks = [];
   List<TaskModel> completedTasks = [];
+  List<TaskModel> deletedTasks = [];
   DateFilterModel selectedDateFilter = DateFilterModel.all;
   DateTime? selectedDateFilterDate = DateTime.now();
   String? searchString;
@@ -68,6 +69,38 @@ class HomeCubit extends Cubit<HomeState> {
         emit(DeleteSuccess());
       case ErrorNetwork<void>():
         emit(DeleteError());
+    }
+  }
+
+  Future<void> addTaskToRecovery(TaskModel task) async {
+    var result = await homeRepository.addTaskToRecovery(task);
+    switch (result) {
+      case SuccessNetwork<void>():
+        emit(AddRecoverySuccess());
+      case ErrorNetwork<void>():
+        emit(AddRecoveryError());
+    }
+  }
+
+  Future<void> deleteTaskFromRecovery(TaskModel task) async {
+    var result = await homeRepository.deleteRecoverTask(task);
+    switch (result) {
+      case SuccessNetwork<void>():
+        emit(DeleteRecoverySuccess());
+      case ErrorNetwork<void>():
+        emit(DeleteRecoveryError());
+    }
+  }
+
+  Future<void> getRecoverTasks() async {
+    emit(GetRecoveryLoading());
+    var result = await homeRepository.getRecoverTasks();
+    switch (result) {
+      case SuccessNetwork<List<TaskModel>>():
+        deletedTasks = result.data;
+        emit(GetRecoverySuccess());
+      case ErrorNetwork<List<TaskModel>>():
+        emit(GetRecoveryError());
     }
   }
 }
