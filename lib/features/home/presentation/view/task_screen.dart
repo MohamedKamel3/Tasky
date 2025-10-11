@@ -24,6 +24,7 @@ class _TaskScreenState extends State<TaskScreen> {
   var titleController = TextEditingController();
   var decriptionController = TextEditingController();
   bool originalDone = false;
+  bool hasChanges = false;
   TaskModel? task;
   DateTime? date;
   int? priority;
@@ -37,6 +38,21 @@ class _TaskScreenState extends State<TaskScreen> {
       originalDone = task!.isDone;
       date = task!.date;
       priority = task!.priority;
+    }
+  }
+
+  void checkForChanges() {
+    bool changed =
+        originalDone != task!.isDone ||
+        titleController.text != task!.title ||
+        decriptionController.text != task!.description ||
+        date != task!.date ||
+        priority != task!.priority;
+
+    if (changed != hasChanges) {
+      setState(() {
+        hasChanges = changed;
+      });
     }
   }
 
@@ -75,7 +91,7 @@ class _TaskScreenState extends State<TaskScreen> {
                       priority = task!.priority;
                     },
                     onTapDate: () async {
-                      date =
+                      final newDate =
                           await showDatePicker(
                             context: context,
                             initialDate: date,
@@ -85,6 +101,13 @@ class _TaskScreenState extends State<TaskScreen> {
                             ),
                           ) ??
                           date;
+
+                      if (newDate != date) {
+                        setState(() {
+                          date = newDate;
+                          hasChanges = true; // 🔥 New
+                        });
+                      }
                     },
                     onTapPriority: () async => await showDialog(
                       barrierDismissible: false,
@@ -92,18 +115,27 @@ class _TaskScreenState extends State<TaskScreen> {
                       builder: (context) => ShowPriorityDialog(
                         selectedPriority: priority!,
                         callBack: (int p1) {
-                          priority = p1;
-                          setState(() {});
+                          if (p1 != priority) {
+                            priority = p1;
+                            hasChanges = true;
+                            setState(() {});
+                          }
                         },
                       ),
                     ),
                     selectedPriority: priority!,
                     onSave: (String title, String description) async {
-                      task!.title = title;
-                      task!.description = description;
-                      task!.date = date!;
-                      task!.priority = priority!;
-                      setState(() {});
+                      if (title != task!.title ||
+                          description != task!.description ||
+                          date != task!.date ||
+                          priority != task!.priority) {
+                        task!.title = title;
+                        task!.description = description;
+                        task!.date = date!;
+                        task!.priority = priority!;
+                        hasChanges = true;
+                        setState(() {});
+                      }
                     },
                     task: task!,
                   );
@@ -132,6 +164,7 @@ class _TaskScreenState extends State<TaskScreen> {
                     GestureDetector(
                       onTap: () {
                         originalDone = !originalDone;
+                        hasChanges = true; // 🔥 New
                         setState(() {});
                       },
                       child: CustomRadioButton(isCompleted: originalDone),
@@ -248,12 +281,16 @@ class _TaskScreenState extends State<TaskScreen> {
           children: [
             Expanded(
               child: OutlinedButton.icon(
-                icon: const Icon(Icons.delete_outline, color: Colors.red),
+                icon: const Icon(Icons.delete_outline, color: Colors.white),
                 label: const Text(
                   "Delete",
-                  style: TextStyle(color: Colors.red),
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 style: OutlinedButton.styleFrom(
+                  backgroundColor: Colors.red,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   side: const BorderSide(color: Colors.red),
                   shape: RoundedRectangleBorder(
@@ -270,32 +307,33 @@ class _TaskScreenState extends State<TaskScreen> {
                 },
               ),
             ),
-            Expanded(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor1,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+            if (hasChanges) // 🔥 الزرار مش هيظهر إلا لو حصل تعديل
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor1,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
-                ),
-                onPressed: () async {
-                  AppDialog.loadingDialog(context: context);
-                  task!.isDone = originalDone;
-                  await homeCubit.updateTask(task!).then((_) {
-                    Navigator.pop(context);
-                    Navigator.pop(context, true);
-                  });
-                },
-                child: const Text(
-                  "Confirm Edit",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
+                  onPressed: () async {
+                    AppDialog.loadingDialog(context: context);
+                    task!.isDone = originalDone;
+                    await homeCubit.updateTask(task!).then((_) {
+                      Navigator.pop(context);
+                      Navigator.pop(context, true);
+                    });
+                  },
+                  child: const Text(
+                    "Confirm Edit",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
           ],
         ),
       ),

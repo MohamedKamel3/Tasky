@@ -243,8 +243,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           enabled: true,
                           child: TaskItemWidget(
                             taskModel: TaskModel(
-                              title: "title",
-                              description: "description",
+                              title: "title titlenhjv",
+                              description: "descriptions dvbkdvnskjvnkvcbcvxn.",
                               date: DateTime.now(),
                               priority: 1,
                               isDone: false,
