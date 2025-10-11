@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:to_do_app/features/auth/presentation/view/login_screen.dart';
 import 'package:to_do_app/features/auth/presentation/view/signup_screen.dart';
 import 'package:to_do_app/features/home/presentation/view/home_screen.dart';
+import 'package:to_do_app/features/home/presentation/view/recovery_screen.dart';
 import 'package:to_do_app/features/on_boarding/presentation/view/on_boarding_screen.dart';
 import 'package:to_do_app/splash_screen.dart';
 import 'package:to_do_app/features/home/presentation/view/task_screen.dart';
@@ -25,7 +26,6 @@ void main() async {
 
 class ToDoApp extends StatelessWidget {
   ToDoApp({super.key, required this.routName});
-
   String routName;
 
   @override
@@ -34,14 +34,14 @@ class ToDoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: SplashScreen.routName,
       routes: {
-        SplashScreen.routName: (context) => SplashScreen(
-          nextRoutName: routName,
-        ),
+        SplashScreen.routName: (context) =>
+            SplashScreen(nextRoutName: routName),
         OnBoardingScreen.routName: (context) => OnBoardingScreen(),
         LoginScreen.routName: (context) => LoginScreen(),
         SignupScreen.routName: (context) => SignupScreen(),
         HomeScreen.routName: (context) => HomeScreen(),
         TaskScreen.routName: (context) => TaskScreen(),
+        RecoveryScreen.routName: (context) => RecoveryScreen(),
       },
     );
   }

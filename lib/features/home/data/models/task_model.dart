@@ -35,7 +35,9 @@ class TaskModel {
     'title': title,
     'titleLowerCase': titleLowerCase,
     'description': description,
-    'date': date?.millisecondsSinceEpoch,
+    'date': date == null
+        ? null
+        : DateTime(date!.year, date!.month, date!.day).millisecondsSinceEpoch,
     'priority': priority,
     'isDone': isDone,
   };

@@ -2,9 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:to_do_app/core/constants/colors.dart';
-import 'package:to_do_app/features/home/data/firebase/task_firebase.dart';
+import 'package:to_do_app/core/utils/show_date.dart';
 import 'package:to_do_app/core/widgets/alert_dialog.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
+import 'package:to_do_app/features/home/data/repo/repository/home_repository_impl.dart';
+import 'package:to_do_app/features/home/presentation/view_model/home_cubit.dart';
 import 'package:to_do_app/features/home/presentation/widgets/custom_radio_button.dart';
 import 'package:to_do_app/features/home/presentation/widgets/edit_task_dialog_widget.dart';
 import 'package:to_do_app/features/home/presentation/widgets/show_priority_dialog.dart';
@@ -21,9 +23,12 @@ class TaskScreen extends StatefulWidget {
 class _TaskScreenState extends State<TaskScreen> {
   var titleController = TextEditingController();
   var decriptionController = TextEditingController();
-
   bool originalDone = false;
+  bool hasChanges = false;
   TaskModel? task;
+  DateTime? date;
+  int? priority;
+  HomeCubit homeCubit = HomeCubit(injectableHomeRepository());
 
   @override
   void didChangeDependencies() {
@@ -31,218 +36,305 @@ class _TaskScreenState extends State<TaskScreen> {
     if (task == null) {
       task = ModalRoute.of(context)!.settings.arguments as TaskModel?;
       originalDone = task!.isDone;
+      date = task!.date;
+      priority = task!.priority;
+    }
+  }
+
+  void checkForChanges() {
+    bool changed =
+        originalDone != task!.isDone ||
+        titleController.text != task!.title ||
+        decriptionController.text != task!.description ||
+        date != task!.date ||
+        priority != task!.priority;
+
+    if (changed != hasChanges) {
+      setState(() {
+        hasChanges = changed;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            spacing: 30,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              MaterialButton(
-                minWidth: 50,
-                padding: EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                color: Color(0xffe0dfe3),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                onPressed: () {
-                  Navigator.pop(context, true);
-                  setState(() {});
-                },
-                child: Text(
-                  "x",
-                  style: TextStyle(color: Colors.red, fontSize: 25),
-                ),
-              ),
-              Row(
-                spacing: 20,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      originalDone = !originalDone;
-                      setState(() {});
+      backgroundColor: const Color(0xFFF7F7F7),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 1,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black,
+          ),
+          onPressed: () => Navigator.pop(context, true),
+        ),
+        title: const Text(
+          "Task Details",
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined, color: Colors.black87),
+            onPressed: () async {
+              await showDialog(
+                barrierDismissible: false,
+                context: context,
+                builder: (context) {
+                  return EditTaskDialog(
+                    title: titleController,
+                    description: decriptionController,
+                    onCancel: () {
+                      date = task!.date;
+                      priority = task!.priority;
                     },
-                    child: CustomRadioButton(isCompleted: originalDone),
-                  ),
-                  Expanded(
-                    child: Text(
-                      task!.title!,
-                      maxLines: 2,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                    onTapDate: () async {
+                      final newDate =
+                          await showDatePicker(
+                            context: context,
+                            initialDate: date,
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime.now().add(
+                              const Duration(days: 365),
+                            ),
+                          ) ??
+                          date;
+
+                      if (newDate != date) {
+                        setState(() {
+                          date = newDate;
+                          hasChanges = true; // 🔥 New
+                        });
+                      }
+                    },
+                    onTapPriority: () async => await showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (context) => ShowPriorityDialog(
+                        selectedPriority: priority!,
+                        callBack: (int p1) {
+                          if (p1 != priority) {
+                            priority = p1;
+                            hasChanges = true;
+                            setState(() {});
+                          }
+                        },
                       ),
                     ),
-                  ),
-                  IconButton(
-                    color: primaryColor1,
-                    onPressed: () async {
-                      await showDialog(
-                        barrierDismissible: false,
-                        context: context,
-                        builder: (context) {
-                          return EditTaskDialog(
-                            title: titleController,
-                            description: decriptionController,
-                            onTapDate: () async {
-                              task!.date =
-                                  await showDatePicker(
-                                    initialDate: task!.date,
-                                    context: context,
-                                    firstDate: DateTime.now(),
-                                    lastDate: DateTime.now().add(
-                                      const Duration(days: 365),
-                                    ),
-                                  ) ??
-                                  task!.date;
-                            },
-                            onTapPriority: () async => await showDialog(
-                              barrierDismissible: false,
-                              context: context,
-                              builder: (context) => ShowPriorityDialog(
-                                selectedPriority: task!.priority!,
-                                callBack: (int p1) {
-                                  task!.priority = p1;
-                                  setState(() {});
-                                },
-                              ),
-                            ),
-                            selectedPriority: task!.priority!,
-                            callBack: (String title, String description) async {
-                              task!.title = title;
-                              task!.description = description;
-                              setState(() {});
-                            },
-                            task: task!,
-                          );
-                        },
-                      );
+                    selectedPriority: priority!,
+                    onSave: (String title, String description) async {
+                      if (title != task!.title ||
+                          description != task!.description ||
+                          date != task!.date ||
+                          priority != task!.priority) {
+                        task!.title = title;
+                        task!.description = description;
+                        task!.date = date!;
+                        task!.priority = priority!;
+                        hasChanges = true;
+                        setState(() {});
+                      }
                     },
-                    icon: Icon(Icons.edit, size: 30),
-                  ),
-                ],
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  task!.description!,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.grey,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Row(
-                spacing: 20,
-                children: [
-                  Image.asset("assets/icons/date.png"),
-                  Text(
-                    "Task Time :",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Spacer(),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: primaryColor1,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      task!.date!.toLocal().toString().split(' ')[0],
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                spacing: 20,
-                children: [
-                  Image.asset("assets/icons/flag.png"),
-                  Text(
-                    "Task Priority :",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  Spacer(),
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: primaryColor1,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      task!.priority!.toString(),
-                      style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
-                ],
-              ),
-              MaterialButton(
-                onPressed: () async {
-                  AppDialog.loadingDialog(context: context);
-                  await TaskFirebase.deleteTask(task!).then((_) {
-                    Navigator.pop(context);
-                    setState(() {
-                      Navigator.pop(context, true);
-                    });
-                  });
+                    task: task!,
+                  );
                 },
+              );
+            },
+          ),
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          spacing: 20,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Row(
-                  spacing: 10,
+                  spacing: 20,
                   children: [
-                    Icon(Icons.delete_outline, color: Colors.red, size: 35),
-                    Text(
-                      "Delete",
-                      style: TextStyle(color: Colors.red, fontSize: 24),
+                    GestureDetector(
+                      onTap: () {
+                        originalDone = !originalDone;
+                        hasChanges = true; // 🔥 New
+                        setState(() {});
+                      },
+                      child: CustomRadioButton(isCompleted: originalDone),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            task!.title!,
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: originalDone ? Colors.grey : Colors.black,
+                              decoration: originalDone
+                                  ? TextDecoration.lineThrough
+                                  : TextDecoration.none,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            task!.description ?? "",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
+              child: ListTile(
+                leading: const Icon(
+                  Icons.calendar_today_outlined,
+                  color: Colors.black54,
+                ),
+                title: const Text(
+                  "Task Date",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: primaryColor1,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    showDate(task!.date!),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 2,
+              child: ListTile(
+                leading: const Icon(Icons.flag_outlined, color: Colors.black54),
+                title: const Text(
+                  "Priority",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: priorityColors[task!.priority! - 1],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    task!.priority.toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      shadows: [
+                        Shadow(
+                          offset: Offset(0, 1),
+                          blurRadius: 2,
+                          color: Colors.black26,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-        child: MaterialButton(
-          height: 50,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          minWidth: double.infinity,
-          color: primaryColor1,
-          onPressed: () async {
-            AppDialog.loadingDialog(context: context);
-            task!.isDone = originalDone;
-            await TaskFirebase.updateTask(task!).then((_) {
-              Navigator.pop(context);
-              Navigator.pop(context, true);
-              setState(() {});
-            });
-          },
-          child: Text(
-            "Comfirm Edit",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Row(
+          spacing: 10,
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.delete_outline, color: Colors.white),
+                label: const Text(
+                  "Delete",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  side: const BorderSide(color: Colors.red),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () async {
+                  AppDialog.loadingDialog(context: context);
+                  await homeCubit.addTaskToRecovery(task!);
+                  await homeCubit.deleteTask(task!).then((_) {
+                    Navigator.pop(context);
+                    Navigator.pop(context, true);
+                  });
+                },
+              ),
             ),
-          ),
+            if (hasChanges)
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor1,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () async {
+                    AppDialog.loadingDialog(context: context);
+                    task!.isDone = originalDone;
+                    await homeCubit.updateTask(task!).then((_) {
+                      Navigator.pop(context);
+                      Navigator.pop(context, true);
+                    });
+                  },
+                  child: const Text(
+                    "Confirm Edit",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ),
     );

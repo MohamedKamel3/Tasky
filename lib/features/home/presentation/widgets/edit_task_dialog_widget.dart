@@ -10,18 +10,18 @@ class EditTaskDialog extends StatelessWidget {
     required this.onTapDate,
     required this.onTapPriority,
     required this.selectedPriority,
-    required this.callBack,
+    required this.onSave,
+    required this.onCancel,
     required this.task,
   });
 
   TextEditingController title;
   TextEditingController description;
-
   final VoidCallback onTapDate;
   final VoidCallback onTapPriority;
   final TaskModel task;
-
-  Function(String, String) callBack;
+  Function(String, String) onSave;
+  Function onCancel;
 
   int selectedPriority = 1;
 
@@ -82,6 +82,9 @@ class EditTaskDialog extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
+              onCancel();
+              title.clear();
+              description.clear();
               Navigator.pop(context);
             },
             child: const Text(
@@ -92,13 +95,13 @@ class EditTaskDialog extends StatelessWidget {
           TextButton(
             onPressed: () {
               if (title.text.isNotEmpty && description.text.isNotEmpty) {
-                callBack(title.text, description.text);
+                onSave(title.text, description.text);
               } else if (title.text.isEmpty && description.text.isNotEmpty) {
-                callBack(task.title!, description.text);
+                onSave(task.title!, description.text);
               } else if (title.text.isNotEmpty && description.text.isEmpty) {
-                callBack(title.text, task.description!);
+                onSave(title.text, task.description!);
               } else {
-                callBack(task.title!, task.description!);
+                onSave(task.title!, task.description!);
               }
               Navigator.pop(context);
             },

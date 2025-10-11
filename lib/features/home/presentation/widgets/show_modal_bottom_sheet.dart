@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_app/core/constants/colors.dart';
+import 'package:to_do_app/core/utils/show_date.dart';
 import 'package:to_do_app/core/utils/validator.dart';
 import 'package:to_do_app/core/widgets/text_form_field_helper.dart';
 
@@ -11,13 +13,15 @@ class ShowModalBottomSheet extends StatefulWidget {
     required this.onTapPriority,
     required this.onTapSend,
     required this.selectedPriority,
+    required this.selectedDate,
   });
   TextEditingController title;
   TextEditingController description;
   void Function() onTapDate;
   void Function() onTapPriority;
   void Function() onTapSend;
-  int selectedPriority = 1;
+  ValueNotifier<int> selectedPriority;
+  ValueNotifier<DateTime> selectedDate;
   @override
   State<ShowModalBottomSheet> createState() => _ShowModalBottomSheetState();
 }
@@ -40,13 +44,81 @@ class _ShowModalBottomSheetState extends State<ShowModalBottomSheet> {
           spacing: 15,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              "Add Task",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+            Row(
+              children: [
+                Text(
+                  "Add Task",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+                Spacer(),
+                ValueListenableBuilder<DateTime>(
+                  valueListenable: widget.selectedDate,
+                  builder:
+                      (BuildContext context, DateTime value, Widget? child) {
+                        return MaterialButton(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 15,
+                            vertical: 15,
+                          ),
+                          onPressed: widget.onTapDate,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            side: BorderSide(width: 2, color: Colors.grey),
+                          ),
+                          child: Row(
+                            spacing: 10,
+                            children: [
+                              Image.asset("assets/icons/date.png"),
+                              Text(
+                                showDate(value),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                ),
+                SizedBox(width: 10),
+                ValueListenableBuilder<int>(
+                  valueListenable: widget.selectedPriority,
+                  builder: (BuildContext context, int value, Widget? child) {
+                    return MaterialButton(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 15,
+                      ),
+                      onPressed: widget.onTapPriority,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: BorderSide(width: 2, color: Colors.grey),
+                      ),
+                      child: Row(
+                        spacing: 10,
+                        children: [
+                          Image.asset(
+                            "assets/icons/flag.png",
+                            color: priorityColors[value - 1],
+                          ),
+                          Text(
+                            value.toString(),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
             TextFormFieldHelper(
               onValidate: Validator.validateTitle,
