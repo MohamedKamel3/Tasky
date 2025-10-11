@@ -5,7 +5,12 @@ import 'package:to_do_app/core/utils/result_network.dart';
 import 'package:to_do_app/features/home/data/models/task_model.dart';
 
 class RecoverTaskFirebase {
-  static CollectionReference<TaskModel> getRecoverTaskCollection() {
+  RecoverTaskFirebase._();
+  static RecoverTaskFirebase? _instance;
+  static RecoverTaskFirebase get instance =>
+      _instance ?? RecoverTaskFirebase._();
+
+  CollectionReference<TaskModel> getRecoverTaskCollection() {
     var id = FirebaseAuth.instance.currentUser!.uid;
     return FirebaseFirestore.instance
         .collection('users')
@@ -21,7 +26,7 @@ class RecoverTaskFirebase {
         );
   }
 
-  static Future<ResultNetwork<void>> addTask(TaskModel taskModel) async {
+  Future<ResultNetwork<void>> addTaskToRecovery(TaskModel taskModel) async {
     try {
       await getRecoverTaskCollection().doc(taskModel.id).set(taskModel);
       return SuccessNetwork(null);
@@ -30,7 +35,7 @@ class RecoverTaskFirebase {
     }
   }
 
-  static Future<ResultNetwork<List<TaskModel>>> getTasks() async {
+  Future<ResultNetwork<List<TaskModel>>> getRecoverTasks() async {
     try {
       Query<TaskModel> query = getRecoverTaskCollection();
 
@@ -44,7 +49,7 @@ class RecoverTaskFirebase {
     }
   }
 
-  static Future<ResultNetwork<void>> deleteTask(TaskModel taskModel) async {
+  Future<ResultNetwork<void>> deleteRecoverTask(TaskModel taskModel) async {
     try {
       await getRecoverTaskCollection().doc(taskModel.id).delete();
       return SuccessNetwork(null);
