@@ -17,6 +17,7 @@
  <img src="app_posters/tasky_app.png" alt="Design">
  <img src="app_posters/home_features.png" alt="Design">
  <img src="app_posters/add_task.png" alt="Design">
+ <img src="app_posters/edit_task.png" alt="Design">
  <img src="app_posters/deleted_tasks.png" alt="Design">
  <img src="app_posters/search_filters.png" alt="Design">
  <img src="app_posters/user_friendly.png" alt="Design">
