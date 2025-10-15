@@ -10,7 +10,6 @@
         • <a href="#key-features">Key Features</a>
         • <a href="#tech-stack">Tech Stack & Tools</a>
         • <a href="#how-it-works">How To Use</a>    
-        • <a href="#api-integration">API Integration</a>
         • <a href="#installation">Installation & Setup</a>
         
  </p>
@@ -51,16 +50,6 @@
         <li><strong>Search Locations:</strong> Enter a city name for weather info.</li>
         <li><strong>Toggle Units:</strong> Switch between °C & °F.</li>
     </ol>
-    
- <h2 id="api-integration">📂 API Integration (Retrofit Example)</h2>
-    <pre>
-<code>
-interface WeatherService {
-    @GET("/v4/weather/forecast")
-    suspend fun getWeather(@Query("location") location: String, @Query("apikey") apiKey: String): Response<WeatherResponse>
-}
-</code>
-    </pre>
     
   <h2 id="installation">🚀 Installation & Setup</h2>
     <ol>
