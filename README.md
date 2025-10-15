@@ -53,8 +53,6 @@
   <h2 id="installation">🚀 Installation & Setup</h2>
     <ol>
         <li>Clone this repository: <code>git clone https://github.com/MohamedElzalama/Tasky.git</code></li>
-        <li>Open the project in Xcode.</li>
-        <li>If API keys are required (e.g., for external services), obtain them and add to the configuration files.</li>
         <li>Run the project on a simulator or physical device.</li>
     </ol>
     
