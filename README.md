@@ -22,39 +22,40 @@
  <img src="app_posters/user_friendly.png" alt="Design">
  
    
-    
- <h2 id="key-features">📌 Key Features</h2>
+<h2 id="key-features">📌 Key Features</h2>
     <ul>
-        <li><strong>Real-Time Weather Data:</strong> Temperature, humidity, wind speed, visibility.</li>
-        <li><strong>Hourly & 5-Day Forecast:</strong> View upcoming weather conditions.</li>
-        <li><strong>Search & Multiple Locations:</strong> Find weather for different cities.</li>
-        <li><strong>Offline Access:</strong> Stores weather data using Room Database.</li>
-        <li><strong>Animations:</strong> Smooth UI interactions with Lottie & MotionLayout.</li>
+        <li><strong>Task Management:</strong> Create, edit, delete, and mark tasks as completed. Tasks include title, description, due date, and priority levels (1-5).</li>
+        <li><strong>Search & Filters:</strong> Quickly search for tasks using the search bar. Filter tasks by priority, date (e.g., All, Day), or view completed tasks in a separate section.</li>
+        <li><strong>Deleted Tasks Bin:</strong> View deleted tasks in a dedicated screen. Swipe left to permanently delete or right to restore tasks.</li>
+        <li><strong>Calendar Integration:</strong> Select due dates using a built-in calendar picker for easy scheduling.</li>
+        <li><strong>Priority System:</strong> Assign priorities to tasks with color-coded indicators for quick visual reference.</li>
+        <li><strong>User-Friendly UI:</strong> Intuitive design with smooth interactions, empty state illustrations, and accessible add task button.</li>
+        <li><strong>Authentication:</strong> Includes a logout feature, suggesting user account management.</li>
+        <li><strong>Empty States:</strong> Helpful messages and illustrations for no tasks or no deleted tasks scenarios.</li>
     </ul>
     
 <h2 id="tech-stack">🛠 Tech Stack & Tools</h2>
     <ul>
-        <li><strong>Development:</strong> Kotlin, Android Studio, Jetpack Compose/XML</li>
-        <li><strong>Networking:</strong> Retrofit + Gson</li>
-        <li><strong>Storage:</strong> Room Database, DataStore, Shared Preference</li>
-        <li><strong>Location Services:</strong> FusedLocationProviderClient</li>
-        <li><strong>Widget:</strong> Glance Widget</li>
-        <li><strong>Notifications:</strong> Work Manager</li>
+        <li><strong>Development:</strong> Flutter, MVVM architecture, Clean architecture, State Management (Bloc), Micro Service architecture.</li>
+        <li><strong>Storage:</strong> Firebase Fire store.</li>
     </ul>
     
 <h2 id="how-it-works">🛠 How It Works</h2>
     <ol>
-        <li><strong>Launch the App:</strong> Fetches current location & weather.</li>
-        <li><strong>View Weather Details:</strong> Displays temperature, wind speed, and humidity.</li>
-        <li><strong>Check Forecast:</strong> Hourly & 5-day updates.</li>
-        <li><strong>Search Locations:</strong> Enter a city name for weather info.</li>
-        <li><strong>Toggle Units:</strong> Switch between °C & °F.</li>
+        <li><strong>Launch the App:</strong> Users are greeted with the main task list screen, showing active tasks, a search bar, filters, and a floating add button.</li>
+        <li><strong>Add a Task:</strong> Tap the "+" button to open the add task popup. Enter title, description, select due date via calendar, and set priority.</li>
+        <li><strong>Manage Tasks:</strong> Swipe on tasks to edit or delete. Mark as completed with checkboxes. View completed tasks separately.</li>
+        <li><strong>Search and Filter:</strong> Use the search bar for keyword search. Apply filters like "Priority" or "Day" to narrow down the list.</li>
+        <li><strong>Deleted Tasks:</strong> Access the deleted tasks screen to restore or permanently delete items via swipes.</li>
+        <li><strong>Logout:</strong> Use the logout button for session management.</li>
     </ol>
     
   <h2 id="installation">🚀 Installation & Setup</h2>
     <ol>
-        <li>Clone this repository: <code>git clone https://github.com/MohamedKamel3/Tasky.git</code></li>
-        <li>Run the project on an emulator or physical device.</li>
+        <li>Clone this repository: <code>git clone https://github.com/MohamedElzalama/Tasky.git</code></li>
+        <li>Open the project in Xcode.</li>
+        <li>If API keys are required (e.g., for external services), obtain them and add to the configuration files.</li>
+        <li>Run the project on a simulator or physical device.</li>
     </ol>
     
 </body>
